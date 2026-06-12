@@ -1,0 +1,10 @@
+node_modules/
+.DS_Store
+.wrangler/
+
+# Local design-exploration scratch — not part of the deployed site
+preview-*.png
+index-v2.html
+index-v3.html
+v2-*.png
+v3-*.png
