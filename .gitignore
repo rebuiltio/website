@@ -8,3 +8,6 @@ index-v2.html
 index-v3.html
 v2-*.png
 v3-*.png
+
+# Designer handoff (brief, internal disclosure notes) — never publish
+handoff/
