@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Rebuilt Health</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='oklch(13%25 0.01 264)'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Georgia,serif' font-size='21' fill='oklch(82%25 0.14 265)'%3ER%3C/text%3E%3C/svg%3E" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rebuilt Health · The autonomous back office for health insurance brokers</title>
   <meta name="description" content="Rebuilt Health is the autonomous back office for health insurance brokers. The computer work goes to the computers. The human work stays with the humans." />
 
   <!-- Open Graph / social preview -->
@@ -15,675 +14,356 @@
   <meta property="og:image" content="https://rebuilt.health/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+
+  <!-- Twitter / X card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Rebuilt Health" />
   <meta name="twitter:description" content="The autonomous back office for health insurance brokers." />
   <meta name="twitter:image" content="https://rebuilt.health/og.png" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@400;500;600&display=swap" />
-
+  <script>document.documentElement.classList.remove('no-js'); document.documentElement.classList.add('js');</script>
   <style>
     /*
-     * Layout: one left-aligned editorial column (64ch measure) with a wider stage
-     * for the hero sort and the day ledger. Single committed dark look.
-     *
-     * Tokens mirror the Rebuilt design system's dark theme values (same names),
-     * inlined so the site stays a zero-build, single-file deploy.
-     * Two site aliases sit on top of the DS semantics: --color-computer (brand)
-     * and --color-human (the DS amber scale), the visual duality of the line
-     * "the computer work goes to the computers, the human work stays with the humans."
+     * Token values mirrored from @rebuilt/ui (dark theme), inlined so the site
+     * stays a zero-build deploy. Employee colors come from the living-marks
+     * palette; marks.js reads --bg, --need and one var per employee.
      */
     :root {
-      color-scheme: dark;
+      --color-bg: #0d1117;
+      --color-surface: #161b22;
+      --color-surface-raised: #1c2128;
+      --color-text: #e6edf3;
+      --color-text-muted: #9198a1;
+      --color-text-subtle: #6e7681;
+      --color-border: #30363d;
+      --color-border-strong: #444c56;
+      --color-accent-300: #66a1ff;
+      --color-accent-400: #3381ff;
+      --color-accent-500: #1f6feb;
+      --color-text-on-brand: #ffffff;
 
-      /* primitive (DS dark) */
-      --slate-1: oklch(13.0% 0.010 264);
-      --slate-2: oklch(15.5% 0.012 264);
-      --slate-3: oklch(18.5% 0.013 264);
-      --slate-6: oklch(28.0% 0.016 264);
-      --slate-7: oklch(34.0% 0.018 264);
-      --slate-10: oklch(63.0% 0.022 264);
-      --slate-11: oklch(75.0% 0.020 264);
-      --slate-12: oklch(95.0% 0.010 264);
-      --amber-9: oklch(82.0% 0.160 85);
-      --amber-11: oklch(85.0% 0.140 85);
-      --brand-9: oklch(68.0% 0.180 265);
-      --brand-10: oklch(72.0% 0.180 265);
-      --brand-11: oklch(82.0% 0.140 265);
-      --brand-contrast: oklch(13.0% 0.010 264);
+      --bg: var(--color-bg);
+      --need: #f0b44c;
+      --tally: #6fd08c;
+      --henry: #eaa94b;
+      --asa: #3fc2b9;
+      --lex: #e46aa3;
+      --elliot: #8f86ff;
 
-      /* semantic (DS names) */
-      --color-bg: var(--slate-1);
-      --color-surface: var(--slate-2);
-      --color-surface-raised: var(--slate-3);
-      --color-text: var(--slate-12);
-      --color-text-muted: var(--slate-11);
-      --color-text-subtle: var(--slate-10);
-      --color-text-on-brand: var(--brand-contrast);
-      --color-border: var(--slate-6);
-      --color-border-strong: var(--slate-7);
-      --color-border-focus: var(--brand-9);
-      --color-accent-bg: var(--brand-9);
-      --color-accent-bg-hover: var(--brand-10);
-      --color-accent-fg: var(--brand-11);
+      --font-sans: "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-      /* site aliases */
-      --color-computer: var(--brand-9);
-      --color-computer-fg: var(--brand-11);
-      --color-computer-soft: color-mix(in oklab, var(--brand-9) 14%, transparent);
-      --color-human: var(--amber-9);
-      --color-human-fg: var(--amber-11);
-      --color-human-soft: color-mix(in oklab, var(--amber-9) 13%, transparent);
-
-      /* type */
-      --font-display: "Fraunces", Georgia, "Times New Roman", serif;
-      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-      --text-sm: 13px;
-      --text-base: 15px;
-      --text-lg: 17px;
-      --text-xl: clamp(19px, 2.2vw, 22px);
-      --text-2xl: clamp(26px, 3.6vw, 36px);
-      --text-hero: clamp(40px, 7.4vw, 88px);
-
-      /* layout + motion */
+      --text-xs: 12px; --text-sm: 14px; --text-md: 16px; --text-lg: 18px;
       --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
       --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-10: 40px;
-      --space-16: 64px; --space-24: 96px;
-      --radius-sm: 4px; --radius-md: 8px; --radius-xl: 14px;
-      --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-      --dur: 180ms;
-      --measure: 64ch;
-      --stage: 1120px;
+      --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --dur: 200ms; --dur-slow: 600ms;
     }
 
-    *, *::before, *::after { box-sizing: border-box; }
-    html { -webkit-font-smoothing: antialiased; text-size-adjust: 100%; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-font-smoothing: antialiased; }
+
     body {
-      margin: 0;
+      font-family: var(--font-sans);
       background: var(--color-bg);
       color: var(--color-text);
-      font-family: var(--font-sans);
-      font-size: var(--text-lg);
-      line-height: 1.65;
-    }
-    h1, h2, h3, p, ul, ol, dl, dd, blockquote, figure { margin: 0; padding: 0; }
-    ul, ol { list-style: none; }
-    a { color: inherit; }
-    :focus-visible { outline: 2px solid var(--color-border-focus); outline-offset: 3px; border-radius: var(--radius-sm); }
-
-    .wrap {
-      width: 100%;
-      max-width: var(--stage);
-      margin-inline: auto;
-      padding-left: max(16px, env(safe-area-inset-left, 0px));
-      padding-right: max(16px, env(safe-area-inset-right, 0px));
-    }
-    @media (min-width: 720px) {
-      .wrap {
-        padding-left: max(40px, env(safe-area-inset-left, 0px));
-        padding-right: max(40px, env(safe-area-inset-right, 0px));
-      }
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: radial-gradient(1000px 600px at 70% -10%, rgba(31, 111, 235, 0.16), transparent 70%); /* token-bypass: accent-500 glow */
+      background-repeat: no-repeat;
     }
 
-    h2 {
-      font-family: var(--font-display);
-      font-weight: 400;
-      font-size: var(--text-2xl);
-      line-height: 1.15;
-      letter-spacing: -0.015em;
-      text-wrap: balance;
-      font-variation-settings: "opsz" 96;
-    }
-    .prose { max-width: var(--measure); display: grid; gap: var(--space-5); color: var(--color-text-muted); }
-    .prose strong { color: var(--color-text); font-weight: 500; }
+    .wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 var(--space-6); }
 
-    section { padding-block: var(--space-16); border-top: 1px solid var(--color-border); }
-    @media (min-width: 720px) { section { padding-block: var(--space-24); } }
-    .section-head { display: grid; gap: var(--space-5); margin-bottom: var(--space-10); max-width: var(--measure); }
+    header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-8) 0; }
+    .mark { font-weight: 700; font-size: var(--text-lg); letter-spacing: -0.01em; }
+    .mark .dot { color: var(--color-accent-400); }
+    .nav-link { color: var(--color-text-muted); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+    .nav-link:hover { color: var(--color-text); }
 
-    /* ---------- header ---------- */
-    .site-header { padding-block: var(--space-6); }
-    .site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
-    .mark {
-      font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 500;
-      letter-spacing: -0.01em;
-      text-decoration: none;
-      font-variation-settings: "opsz" 40;
-    }
-    .header-link {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      text-decoration: none;
-      padding: var(--space-2) var(--space-3);
-      border: 1px solid var(--color-border);
-      border-radius: 999px;
-      transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
-    }
-    .header-link:hover { color: var(--color-text); border-color: var(--color-border-strong); }
+    h1 { font-size: clamp(36px, 6vw, 60px); line-height: 1.05; letter-spacing: -0.025em; font-weight: 700; margin-bottom: var(--space-6); }
+    h1 .accent { color: var(--color-accent-300); }
+    h2 { font-size: clamp(28px, 4vw, 40px); line-height: 1.1; letter-spacing: -0.02em; font-weight: 700; margin-bottom: var(--space-4); }
+    .lede { font-size: clamp(17px, 2.2vw, 20px); color: var(--color-text-muted); max-width: 46ch; margin-bottom: var(--space-8); }
+    .eyebrow { font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-accent-300); margin-bottom: var(--space-3); }
 
-    /* ---------- hero ---------- */
-    .hero { padding-block: var(--space-10) var(--space-16); }
-    .hero h1 {
-      font-family: var(--font-display);
-      font-weight: 300;
-      font-size: var(--text-hero);
-      line-height: 1.02;
-      letter-spacing: -0.03em;
-      max-width: 15ch;
-      text-wrap: balance;
-      font-variation-settings: "opsz" 144;
-    }
-    .hero-line {
-      margin-top: var(--space-8);
-      display: grid;
-      gap: var(--space-2);
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      line-height: 1.35;
-      font-variation-settings: "opsz" 36;
-    }
-    .hero-line .c { color: var(--color-computer-fg); }
-    .hero-line .h { color: var(--color-human-fg); }
-    .hero-lede { margin-top: var(--space-6); max-width: 52ch; color: var(--color-text-muted); }
+    /* Hero */
+    .hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--space-8); align-items: center; padding: var(--space-8) 0 96px; }
+    .hero-mark { position: relative; width: 100%; max-width: 460px; justify-self: center; }
+    .hero-mark canvas { width: 100%; aspect-ratio: 1; display: block; }
 
-    /* The sort: the one bold element on the page. Default markup is the sorted state. */
-    .sort {
-      margin-top: var(--space-16);
-      position: relative;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: var(--space-10);
-    }
-    @media (min-width: 760px) { .sort { grid-template-columns: 1.15fr 1fr; gap: var(--space-8); } }
-    .bin { min-width: 0; }
-    .bin-head {
-      display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4);
-      padding-bottom: var(--space-3); margin-bottom: var(--space-4);
-      border-bottom: 2px solid var(--bin-color);
-    }
-    .bin-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 400; }
-    .bin-note { font-size: var(--text-sm); color: var(--color-text-subtle); text-align: right; }
-    .bin--computer { --bin-color: var(--color-computer); --chip-bg: var(--color-computer-soft); --chip-dot: var(--color-computer); }
-    .bin--human { --bin-color: var(--color-human); --chip-bg: var(--color-human-soft); --chip-dot: var(--color-human); }
-    .chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-    .chip {
-      display: inline-flex; align-items: baseline; gap: var(--space-2);
-      font-size: var(--text-base);
-      line-height: 1.35;
-      padding: var(--space-2) var(--space-3);
-      border-radius: var(--radius-md);
-      background: var(--chip-bg);
-      color: var(--color-text);
-      border: 1px solid color-mix(in oklab, var(--chip-dot) 30%, transparent);
-      will-change: transform;
-    }
-    .chip::before {
-      content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%;
-      background: var(--chip-dot); transform: translateY(-1px);
-    }
-    .sort.is-piled .chip { background: var(--color-surface-raised); border-color: var(--color-border-strong); }
-    .sort.is-piled .chip::before { background: var(--color-text-subtle); }
-    .sort.is-sorting .chip {
-      transition:
-        transform 900ms var(--ease) var(--delay, 0ms),
-        background-color 500ms var(--ease) calc(var(--delay, 0ms) + 300ms),
-        border-color 500ms var(--ease) calc(var(--delay, 0ms) + 300ms);
-    }
-    .sort.is-sorting .chip::before { transition: background-color 500ms var(--ease) calc(var(--delay, 0ms) + 300ms); }
-    .sort-replay {
-      margin-top: var(--space-6);
-      font: inherit; font-size: var(--text-sm);
-      color: var(--color-text-subtle);
-      background: none; border: 0; padding: 0;
-      text-decoration: underline; text-underline-offset: 3px;
-      cursor: pointer;
-    }
-    .sort-replay:hover { color: var(--color-text-muted); }
-    .no-js .sort-replay { display: none; }
-
-    /* ---------- quotes ---------- */
-    .quotes { display: grid; gap: var(--space-6); margin-bottom: var(--space-10); }
-    @media (min-width: 760px) { .quotes { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-10); row-gap: var(--space-8); } }
-    .quotes blockquote {
-      font-family: var(--font-display);
-      font-style: italic;
-      font-weight: 300;
-      font-size: var(--text-xl);
-      line-height: 1.4;
-      padding-left: var(--space-5);
-      border-left: 1px solid var(--color-border-strong);
-      font-variation-settings: "opsz" 48;
-    }
-    .quotes blockquote:last-child { color: var(--color-text-muted); }
-    .kicker {
-      margin-top: var(--space-10);
-      max-width: 30ch;
-      font-family: var(--font-display);
-      font-size: var(--text-2xl);
-      line-height: 1.2;
-      text-wrap: balance;
-      font-variation-settings: "opsz" 96;
-    }
-
-    /* ---------- the day ---------- */
-    .day { display: grid; max-width: 900px; }
-    .entry {
-      display: grid;
-      grid-template-columns: 4.5rem minmax(0, 1fr);
-      column-gap: var(--space-4);
-      row-gap: var(--space-2);
-      padding-block: var(--space-5);
-      border-top: 1px solid var(--color-border);
-    }
-    @media (min-width: 720px) {
-      .entry { grid-template-columns: 6rem minmax(0, 1fr) 7rem; column-gap: var(--space-8); align-items: baseline; }
-    }
-    .entry time {
-      font-size: var(--text-sm);
-      color: var(--color-text-subtle);
-      font-variant-numeric: tabular-nums;
-      padding-top: 3px;
-    }
-    .entry p { color: var(--color-text); }
-    .tag {
-      grid-column: 2;
-      justify-self: start;
-      font-size: var(--text-sm);
-      padding: 2px var(--space-3);
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-    @media (min-width: 720px) { .tag { grid-column: 3; justify-self: end; } }
-    .tag--handled { color: var(--color-computer-fg); background: var(--color-computer-soft); }
-    .tag--yours { color: var(--color-human-fg); background: var(--color-human-soft); }
-    .entry--end { border-bottom: 1px solid var(--color-border); }
-    .entry--end p { font-family: var(--font-display); font-size: var(--text-xl); line-height: 1.35; }
-    .day-caption { margin-top: var(--space-4); font-size: var(--text-sm); color: var(--color-text-subtle); }
-
-    .desks { margin-top: var(--space-16); max-width: 900px; }
-    .desks h3 { font-family: var(--font-display); font-weight: 400; font-size: var(--text-xl); margin-bottom: var(--space-4); }
-    .desk {
-      display: grid; gap: var(--space-1);
-      padding-block: var(--space-4);
-      border-top: 1px solid var(--color-border);
-    }
-    @media (min-width: 720px) { .desk { grid-template-columns: 16rem minmax(0, 1fr); gap: var(--space-8); } }
-    .desk dt { font-weight: 500; }
-    .desk dd { color: var(--color-text-muted); min-width: 0; }
-
-    /* ---------- job posting: the one bordered object ---------- */
-    .posting {
-      max-width: 760px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border-strong);
-      border-radius: var(--radius-xl);
-      padding: var(--space-6);
-      display: grid;
-      gap: var(--space-8);
-    }
-    @media (min-width: 720px) { .posting { padding: var(--space-10); } }
-    .posting-title {
-      font-family: var(--font-display);
-      font-weight: 400;
-      font-size: var(--text-2xl);
-      line-height: 1.15;
-      font-variation-settings: "opsz" 96;
-    }
-    .posting-meta { display: grid; gap: var(--space-3); }
-    .posting-meta div { display: grid; gap: var(--space-1); }
-    @media (min-width: 600px) { .posting-meta div { grid-template-columns: 8.5rem minmax(0, 1fr); gap: var(--space-4); } }
-    .posting-meta dt { color: var(--color-text-subtle); font-size: var(--text-base); }
-    .posting-meta dd { min-width: 0; }
-    .posting h4 { font-size: var(--text-base); font-weight: 600; margin: 0 0 var(--space-3); }
-    .posting ul { display: grid; gap: var(--space-3); }
-    .posting li { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: var(--space-3); color: var(--color-text-muted); }
-    .posting li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; margin-top: 0.62em; background: var(--li-dot); }
-    .will { --li-dot: var(--color-computer); }
-    .wont { --li-dot: var(--color-human); }
-    .posting-sign {
-      border-top: 1px solid var(--color-border);
-      padding-top: var(--space-6);
-      font-family: var(--font-display);
-      font-size: var(--text-xl);
-      line-height: 1.4;
-      font-variation-settings: "opsz" 36;
-    }
-
-    /* ---------- proof ---------- */
-    .story { display: grid; gap: var(--space-10); }
-    @media (min-width: 860px) { .story { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); gap: var(--space-16); align-items: start; } }
-    .story .section-head { margin-bottom: 0; }
-    .proof-line {
-      font-family: var(--font-display);
-      font-weight: 300;
-      font-size: var(--text-2xl);
-      line-height: 1.2;
-      padding-top: var(--space-5);
-      border-top: 2px solid var(--color-human);
-      text-wrap: balance;
-      font-variation-settings: "opsz" 96;
-    }
-
-    /* ---------- team ---------- */
-    .team { display: grid; max-width: 900px; }
-    .member {
-      display: grid; gap: var(--space-1);
-      padding-block: var(--space-5);
-      border-top: 1px solid var(--color-border);
-    }
-    @media (min-width: 720px) { .member { grid-template-columns: 12rem minmax(0, 1fr); gap: var(--space-8); align-items: baseline; } }
-    .member-name { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 400; }
-    .member-job { font-size: var(--text-sm); color: var(--color-text-subtle); display: block; font-family: var(--font-sans); }
-    .member p { color: var(--color-text-muted); min-width: 0; }
-
-    /* ---------- CTA + footer ---------- */
-    .cta h2 { font-size: clamp(30px, 5vw, 56px); font-weight: 300; max-width: 20ch; letter-spacing: -0.025em; }
-    .cta-row { margin-top: var(--space-10); display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
     .btn {
-      display: inline-flex; align-items: center;
-      font-size: var(--text-base); font-weight: 600;
-      text-decoration: none;
-      color: var(--color-text-on-brand);
-      background: var(--color-accent-bg);
-      padding: var(--space-3) var(--space-6);
-      border-radius: var(--radius-md);
-      transition: background-color var(--dur) var(--ease);
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      background: var(--color-accent-500); color: var(--color-text-on-brand);
+      text-decoration: none; font-weight: 600; font-size: var(--text-sm);
+      padding: var(--space-3) var(--space-6); border-radius: var(--radius-md);
+      transition: background var(--dur) var(--ease), transform var(--dur) var(--ease);
     }
-    .btn:hover { background: var(--color-accent-bg-hover); }
-    .site-footer { padding-block: var(--space-10); border-top: 1px solid var(--color-border); color: var(--color-text-subtle); font-size: var(--text-sm); }
-    .site-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); }
-    .site-footer a { text-decoration: none; }
-    .site-footer a:hover { color: var(--color-text-muted); }
+    .btn:hover { background: var(--color-accent-400); transform: translateY(-1px); }
+    .btn-secondary { background: transparent; border: 1px solid var(--color-border-strong); color: var(--color-text); }
+    .btn-secondary:hover { background: var(--color-surface-raised); border-color: var(--color-accent-400); }
 
+    section { padding: 96px 0; }
+    .center { text-align: center; }
+    .center .lede { margin-left: auto; margin-right: auto; }
+
+    /* The line: two conveyor belts of work */
+    .belts { display: grid; gap: var(--space-4); margin-top: var(--space-10); }
+    .belts > div { min-width: 0; }
+    .belt-label { font-size: var(--text-sm); font-weight: 600; margin-bottom: var(--space-2); }
+    .belt-label.computer { color: var(--color-accent-300); }
+    .belt { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); /* token-bypass: mask alpha */ }
+    .belt-track { display: flex; gap: var(--space-3); width: max-content; animation: slide 48s linear infinite; }
+    .belt.human .belt-track { animation-duration: 64s; animation-direction: reverse; }
+    .chip {
+      font-size: var(--text-sm); white-space: nowrap;
+      padding: var(--space-2) var(--space-4); border-radius: 999px;
+      background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-text-muted);
+    }
+    .belt.computer .chip { border-color: rgba(51, 129, 255, 0.35); color: var(--color-text); } /* token-bypass: accent-400 at 35% */
+    @keyframes slide { to { transform: translateX(-50%); } }
+
+    /* Team */
+    .team { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-4); margin-top: var(--space-10); }
+    .member {
+      background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl);
+      padding: var(--space-5) var(--space-4) var(--space-6); text-align: center;
+      transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+    }
+    .member:hover { border-color: var(--color-border-strong); transform: translateY(-3px); }
+    .member canvas { width: 100%; max-width: 150px; aspect-ratio: 1; display: block; margin: 0 auto var(--space-3); }
+    .member-name { font-weight: 700; font-size: var(--text-lg); }
+    .member-desk { font-size: var(--text-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: var(--space-3); }
+    .member-line { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.5; }
+
+    /* The day */
+    .day { display: grid; grid-template-columns: 1fr 1.3fr; gap: 64px; align-items: start; }
+    .day-mark { position: sticky; top: 64px; }
+    .day-mark canvas { width: 100%; max-width: 380px; aspect-ratio: 1; display: block; }
+    .log-row {
+      display: grid; grid-template-columns: 40px 1fr; gap: var(--space-4); align-items: start;
+      padding: var(--space-5); margin-bottom: var(--space-3);
+      background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+    }
+    .log-row.yours { border-color: rgba(240, 180, 76, 0.45); } /* token-bypass: need at 45% */
+    .log-row canvas { width: 40px; height: 40px; display: block; }
+    .log-meta { display: flex; gap: var(--space-3); align-items: center; margin-bottom: var(--space-1); }
+    .log-time { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-text-subtle); }
+    .tag { font-size: var(--text-xs); font-weight: 600; color: var(--tally); }
+    .yours .tag { color: var(--need); }
+    .log-text { font-size: var(--text-md); }
+    .log-note { font-size: var(--text-xs); color: var(--color-text-subtle); margin-top: var(--space-3); }
+
+    /* Proof */
+    .proof { font-size: clamp(22px, 3.2vw, 32px); font-weight: 700; line-height: 1.25; letter-spacing: -0.015em; max-width: 26ch; margin: 0 auto var(--space-6); }
+    .founder { font-size: var(--text-md); color: var(--color-text-muted); max-width: 60ch; margin: 0 auto; }
+
+    .final { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: 64px var(--space-8); }
+    .final .cta-row { justify-content: center; }
+
+    footer { padding: var(--space-10) 0; color: var(--color-text-subtle); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); }
+    footer a { color: var(--color-text-subtle); text-decoration: none; }
+    footer a:hover { color: var(--color-text-muted); }
+
+    /* Scroll reveal: only when JS runs, never for reduced motion */
+    .js .reveal { opacity: 0; transform: translateY(16px); transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease); }
+    .js .reveal.in { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      .team { grid-template-columns: repeat(3, 1fr); }
+      .day { grid-template-columns: 1fr; gap: var(--space-8); }
+      .day-mark { position: static; }
+      .day-mark canvas { max-width: 240px; margin: 0 auto; }
+    }
+    @media (max-width: 640px) {
+      .wrap { padding: 0 var(--space-4); }
+      .hero { grid-template-columns: 1fr; padding-bottom: 64px; }
+      .hero-mark { order: -1; max-width: 280px; }
+      section { padding: 64px 0; }
+      .team { grid-template-columns: repeat(2, 1fr); }
+      .final { padding: var(--space-10) var(--space-5); }
+    }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .belt-track { animation: none; flex-wrap: wrap; width: auto; }
+      .belt-track .dup { display: none; }
+      .js .reveal { opacity: 1; transform: none; transition: none; }
+      .btn, .member { transition: none; }
+      .btn:hover, .member:hover { transform: none; }
     }
   </style>
 </head>
-<body class="no-js">
-  <header class="site-header">
-    <div class="wrap">
-      <a class="mark" href="#top" id="top">Rebuilt Health</a>
-      <a class="header-link" href="https://www.linkedin.com/in/mikemcbridelinkedin/" target="_blank" rel="noopener">Talk to Mike</a>
-    </div>
-  </header>
+<body>
+  <div class="wrap">
+    <header>
+      <span class="mark">Rebuilt Health<span class="dot">.</span></span>
+      <a class="nav-link" href="https://www.linkedin.com/in/mikemcbridelinkedin/" target="_blank" rel="noopener">Talk to Mike</a>
+    </header>
 
-  <main>
-    <!-- Hero: the positioning line, then the sort that shows it -->
-    <div class="hero">
-      <div class="wrap">
-        <h1>The autonomous back office for health insurance brokers.</h1>
-        <p class="hero-line">
-          <span class="c">The computer work goes to the computers.</span>
-          <span class="h">The human work stays with the humans.</span>
-        </p>
-        <p class="hero-lede">I build digital employees that take the minutia off your back-office desks. They never sleep, never forget a task, and never drop a handoff. Your people get their days back for the work that wins clients and keeps them.</p>
-
-        <div class="sort" id="sort" aria-label="Back-office work sorted into computer work and human work">
-          <div class="bin bin--computer">
-            <div class="bin-head">
-              <h2 class="bin-title">The computer work</h2>
-              <span class="bin-note">goes to your digital employees</span>
-            </div>
-            <ul class="chips">
-              <li class="chip" data-order="0">Pull the ID card from the carrier portal</li>
-              <li class="chip" data-order="2">Re-key one application into four systems</li>
-              <li class="chip" data-order="4">Chase the missing Social Security number</li>
-              <li class="chip" data-order="5">Send the third follow-up on a stalled appointment</li>
-              <li class="chip" data-order="7">Check every commission statement</li>
-              <li class="chip" data-order="8">Book the appointment and route it to the right agent</li>
-              <li class="chip" data-order="10">Crawl the termination and delinquency reports</li>
-              <li class="chip" data-order="12">Text everyone who didn't book</li>
-            </ul>
-          </div>
-          <div class="bin bin--human">
-            <div class="bin-head">
-              <h2 class="bin-title">The human work</h2>
-              <span class="bin-note">stays with your people</span>
-            </div>
-            <ul class="chips">
-              <li class="chip" data-order="1">Advise a family on the plan that keeps their doctor</li>
-              <li class="chip" data-order="3">Call the client who just lost coverage</li>
-              <li class="chip" data-order="6">Win the group</li>
-              <li class="chip" data-order="9">Decide what to do about the carrier that keeps stalling</li>
-              <li class="chip" data-order="11">Sit with a client at renewal</li>
-            </ul>
+    <main>
+      <div class="hero">
+        <div>
+          <h1>The autonomous back office for <span class="accent">health insurance brokers</span>.</h1>
+          <p class="lede">A digital team that works alongside your people. They never sleep, never forget a task, and never drop a handoff.</p>
+          <div class="cta-row">
+            <a class="btn" href="mailto:mikemcbride15@gmail.com">Get in touch</a>
+            <a class="btn btn-secondary" href="https://www.linkedin.com/in/mikemcbridelinkedin/" target="_blank" rel="noopener">Connect on LinkedIn</a>
           </div>
         </div>
-        <button class="sort-replay" type="button" id="sort-replay">Sort the pile again</button>
-      </div>
-    </div>
-
-    <!-- The problem, in their words -->
-    <section aria-labelledby="week">
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="week">Your week, in your words.</h2>
-          <p class="prose">I sat with twenty agencies before I wrote a line of code. This is what I heard.</p>
-        </div>
-        <div class="quotes">
-          <blockquote>“Fifteen portals into one CRM.”</blockquote>
-          <blockquote>“A weekly crawl through the termination and delinquency reports, by hand.”</blockquote>
-          <blockquote>“Open enrollment is seventy-hour weeks doing the same lookups as last year.”</blockquote>
-          <blockquote>“If she quits in October, I have a hundred and fifty open cases and nobody to train the next one.”</blockquote>
-          <blockquote>“I tried an AI tool. Maybe half right. I don't trust it, so I don't use it.”</blockquote>
-        </div>
-        <div class="prose">
-          <p>You hired good people to grow an agency. They spend their days as human APIs between systems that don't talk to each other. Data moves from one portal to another. A change in one place gets re-entered in four others. Over and over, every day, forever.</p>
-        </div>
-        <p class="kicker">Your back office caps your growth, and it is one resignation away from stopping.</p>
-      </div>
-    </section>
-
-    <!-- Process as outcome: a day narrated by the digital employee -->
-    <section aria-labelledby="day">
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="day">A Tuesday on the desk.</h2>
-          <p class="prose">Here is a day when the computer work has an owner. Your digital employee keeps the log. Every line used to need a person to remember it.</p>
-        </div>
-        <ol class="day">
-          <li class="entry">
-            <time>7:58 am</time>
-            <p>A client texted for her dental card. I pulled it from the carrier and texted it back with “What else do you need?”</p>
-            <span class="tag tag--handled">Handled</span>
-          </li>
-          <li class="entry">
-            <time>8:15 am</time>
-            <p>Four agent appointments were waiting on carriers. I sent the follow-ups. One came back approved, so I moved it forward and told the agent.</p>
-            <span class="tag tag--handled">Handled</span>
-          </li>
-          <li class="entry">
-            <time>9:40 am</time>
-            <p>A new enrollment came in missing the baby's birth certificate. I asked the family again, kindly, and I'll ask Thursday if it's still missing.</p>
-            <span class="tag tag--handled">Handled</span>
-          </li>
-          <li class="entry">
-            <time>11:05 am</time>
-            <p>A client asked whether switching plans keeps her doctor. That's advice, so it went to Maria with both plans and the network check attached.</p>
-            <span class="tag tag--yours">Yours</span>
-          </li>
-          <li class="entry">
-            <time>1:30 pm</time>
-            <p>Maria told me one carrier now wants the W-9 before the application. She told me once. I work that way now.</p>
-            <span class="tag tag--handled">Handled</span>
-          </li>
-          <li class="entry">
-            <time>2:50 pm</time>
-            <p>One carrier's August commission never posted. I flagged the client and the statement line for your accountant.</p>
-            <span class="tag tag--handled">Handled</span>
-          </li>
-          <li class="entry entry--end">
-            <time>4:45 pm</time>
-            <p>Everything else is done. Two decisions are waiting for you, with what I know about each.</p>
-            <span class="tag tag--yours">Yours</span>
-          </li>
-        </ol>
-        <p class="day-caption">An illustrative day. Names and details are examples.</p>
-
-        <div class="desks">
-          <h3>Desks I work alongside</h3>
-          <dl>
-            <div class="desk"><dt>Carrier contracting</dt><dd>Every open appointment sorted, the follow-ups sent, the late paperwork chased.</dd></div>
-            <div class="desk"><dt>Enrollment</dt><dd>Applications chased for the missing piece. Every client who didn't book gets followed up until they book or say no.</dd></div>
-            <div class="desk"><dt>Client service</dt><dd>ID cards pulled and sent. Appointments booked and routed to the right agent.</dd></div>
-            <div class="desk"><dt>Commissions</dt><dd>Every carrier statement checked against what you wrote. The missing one gets caught at sixty days, not at year end.</dd></div>
-            <div class="desk"><dt>Plan and carrier questions</dt><dd>Answers with the source attached, and a straight “the documents don't say” when they don't.</dd></div>
-          </dl>
+        <div class="hero-mark" aria-hidden="true">
+          <canvas data-who="tally" data-state="working" data-team="henry:working,asa:working,lex:working,elliot:need"></canvas>
         </div>
       </div>
-    </section>
 
-    <!-- The hire -->
-    <section aria-labelledby="hire">
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="hire">Don't backfill the job. Hire for it.</h2>
-          <p class="prose">Each piece of the minutia is small. Together they're a job. When the person doing it leaves, you can rehire and retrain, or you can post this.</p>
-        </div>
-        <article class="posting" aria-labelledby="posting-title">
-          <h3 class="posting-title" id="posting-title">Back-office digital employee</h3>
-          <dl class="posting-meta">
-            <div><dt>Reports to</dt><dd>Your operations lead</dd></div>
-            <div><dt>Schedule</dt><dd>Always on. No PTO. Doesn't care that it's open enrollment.</dd></div>
-            <div><dt>Trained on</dt><dd>Your process, your carriers, and your CRM.</dd></div>
-          </dl>
-          <div class="will">
-            <h4>What I'll do</h4>
-            <ul>
-              <li>Take the minutia off every desk I work alongside, so each person on it does twice the work.</li>
-              <li>Keep every open case sorted, send the follow-ups, and chase what's late.</li>
-              <li>Tell you the one thing you need to decide, with what I know about it.</li>
-              <li>Narrate my own progress, and ask for help when I hit a wall.</li>
-              <li>Change how I work when you tell me the process changed.</li>
-            </ul>
+      <section class="center reveal">
+        <p class="eyebrow">The line we draw</p>
+        <h2>The computer work goes to the computers.</h2>
+        <p class="lede">The human work stays with your people.</p>
+        <div class="belts" aria-label="Examples of computer work and human work">
+          <div>
+            <div class="belt-label computer">Your digital team takes</div>
+            <div class="belt computer"><div class="belt-track">
+              <span class="chip">Re-key one application into four systems</span>
+              <span class="chip">Send the third follow-up on a stalled appointment</span>
+              <span class="chip">Chase the missing document</span>
+              <span class="chip">Pull the ID card from the carrier portal</span>
+              <span class="chip">Route the appointment to the right agent</span>
+              <span class="chip">Text everyone who didn't book</span>
+              <span class="chip dup" aria-hidden="true">Re-key one application into four systems</span>
+              <span class="chip dup" aria-hidden="true">Send the third follow-up on a stalled appointment</span>
+              <span class="chip dup" aria-hidden="true">Chase the missing document</span>
+              <span class="chip dup" aria-hidden="true">Pull the ID card from the carrier portal</span>
+              <span class="chip dup" aria-hidden="true">Route the appointment to the right agent</span>
+              <span class="chip dup" aria-hidden="true">Text everyone who didn't book</span>
+            </div></div>
           </div>
-          <div class="wont">
-            <h4>What I won't do</h4>
-            <ul>
-              <li>Sell, or anything that needs a license. That stays with your agents. I do the minutia so they have time to sell.</li>
-              <li>Make the crucial calls. I prepare them. You decide.</li>
-              <li>Work outside your rules.</li>
-            </ul>
-          </div>
-          <p class="posting-sign">When the next person leaves, the process stays. The new hire learns it from me.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- PROOF STORY: confirm with Mike before shipping. -->
-    <section aria-labelledby="proof">
-      <div class="wrap story">
-        <div class="section-head">
-          <h2 id="proof">What happened at our first customer.</h2>
-          <div class="prose">
-            <p>Their contracting coordinator gave notice. She ran that desk alone. The owner asked who was going to train her replacement.</p>
-            <p>Her process already lived in a digital employee. <strong>So he trained the replacement.</strong></p>
-            <p>He takes the minutia off her desk. He keeps every open case sorted, sends the follow-ups, chases what's late, and tells her the one thing she needs to decide. When the process changed, she told him, and he changed with it.</p>
-            <p>She does twice the work she did before. Nobody was fired. She kept the judgment.</p>
+          <div>
+            <div class="belt-label">Your people keep</div>
+            <div class="belt human"><div class="belt-track">
+              <span class="chip">Advise a family on the plan that keeps their doctor</span>
+              <span class="chip">Call the client who just lost coverage</span>
+              <span class="chip">Sit with a client at renewal</span>
+              <span class="chip">Win the group</span>
+              <span class="chip dup" aria-hidden="true">Advise a family on the plan that keeps their doctor</span>
+              <span class="chip dup" aria-hidden="true">Call the client who just lost coverage</span>
+              <span class="chip dup" aria-hidden="true">Sit with a client at renewal</span>
+              <span class="chip dup" aria-hidden="true">Win the group</span>
+            </div></div>
           </div>
         </div>
-        <p class="proof-line">We're working with multiple insurance agencies as development partners. The first is live.</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- ROSTER: confirm with Mike before shipping. Delete this section to ship without it. -->
-    <section aria-labelledby="team">
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="team">The team.</h2>
-          <p class="prose">Each one owns a job, and each one has a way of doing it. Your people talk to them like coworkers.</p>
-        </div>
+      <!-- ROSTER: confirm with Mike before shipping -->
+      <section class="center reveal">
+        <p class="eyebrow">The team</p>
+        <h2>Each one owns a desk.</h2>
+        <p class="lede">Your people talk to them like coworkers.</p>
         <div class="team">
-          <div class="member"><span class="member-name">Tally<span class="member-job">Chief of staff</span></span><p>“Tell me what you need. I'll get it to the right teammate and tell you where it stands.”</p></div>
-          <div class="member"><span class="member-name">Henry<span class="member-job">Carrier contracting</span></span><p>“I keep your appointments moving. When a carrier drags, I push.”</p></div>
-          <div class="member"><span class="member-name">Asa<span class="member-job">Enrollment</span></span><p>“I run the routine pipeline without being asked. I flag the client's cost before I act, never after.”</p></div>
-          <div class="member"><span class="member-name">Lex<span class="member-job">Plan and carrier questions</span></span><p>“The answer first, with the receipt. If the documents don't say, I tell you so.”</p></div>
-          <div class="member"><span class="member-name">Abe<span class="member-job">Quoting</span></span><p>“The straight number, then the one assumption that matters.”</p></div>
+          <div class="member">
+            <canvas data-who="tally" data-state="working" data-team="henry:working,asa:working,lex:working,elliot:idle" aria-hidden="true"></canvas>
+            <div class="member-name">Tally</div>
+            <div class="member-desk" style="color: var(--tally)">Chief of staff</div>
+            <p class="member-line">"Tell me what you need. I'll tell you where it stands."</p>
+          </div>
+          <div class="member">
+            <canvas data-who="henry" data-state="working" aria-hidden="true"></canvas>
+            <div class="member-name">Henry</div>
+            <div class="member-desk" style="color: var(--henry)">Contracting</div>
+            <p class="member-line">"I keep your appointments moving. When a carrier drags, I push."</p>
+          </div>
+          <div class="member">
+            <canvas data-who="asa" data-state="working" aria-hidden="true"></canvas>
+            <div class="member-name">Asa</div>
+            <div class="member-desk" style="color: var(--asa)">Enrollment</div>
+            <p class="member-line">"I run the routine pipeline without being asked."</p>
+          </div>
+          <div class="member">
+            <canvas data-who="lex" data-state="working" aria-hidden="true"></canvas>
+            <div class="member-name">Lex</div>
+            <div class="member-desk" style="color: var(--lex)">Plan questions</div>
+            <p class="member-line">"The answer first, with the receipt."</p>
+          </div>
+          <div class="member">
+            <canvas data-who="elliot" data-state="working" aria-hidden="true"></canvas>
+            <div class="member-name">Elliot</div>
+            <div class="member-desk" style="color: var(--elliot)">Your process</div>
+            <p class="member-line">"Tell me once how you work. The team works that way."</p>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section aria-labelledby="founders">
-      <div class="wrap">
-        <div class="section-head">
-          <h2 id="founders">Who's building it.</h2>
+      <section class="reveal">
+        <div class="day">
+          <div class="day-mark">
+            <p class="eyebrow">The process</p>
+            <h2>A Tuesday on the desk.</h2>
+            <p class="lede">Every line used to need a person to remember it.</p>
+            <canvas data-who="henry" data-state="working" aria-hidden="true"></canvas>
+          </div>
+          <div>
+            <div class="log-row reveal">
+              <canvas data-who="henry" data-state="working" aria-hidden="true"></canvas>
+              <div><div class="log-meta"><span class="log-time">8:15 am</span><span class="tag">Handled</span></div>
+              <p class="log-text">Four appointments were waiting on carriers. I sent the follow-ups. One came back approved, so I moved it forward and told the agent.</p></div>
+            </div>
+            <div class="log-row reveal">
+              <canvas data-who="asa" data-state="working" aria-hidden="true"></canvas>
+              <div><div class="log-meta"><span class="log-time">9:40 am</span><span class="tag">Handled</span></div>
+              <p class="log-text">An enrollment came in missing a birth certificate. I asked the family, and I'll ask again Thursday.</p></div>
+            </div>
+            <div class="log-row yours reveal">
+              <canvas data-who="lex" data-state="need" aria-hidden="true"></canvas>
+              <div><div class="log-meta"><span class="log-time">11:05 am</span><span class="tag">Yours</span></div>
+              <p class="log-text">A client asked whether switching plans keeps her doctor. That's advice, so it went to Maria with both plans attached.</p></div>
+            </div>
+            <div class="log-row yours reveal">
+              <canvas data-who="tally" data-state="need" data-team="henry:idle,asa:idle,lex:need" aria-hidden="true"></canvas>
+              <div><div class="log-meta"><span class="log-time">4:45 pm</span><span class="tag">Yours</span></div>
+              <p class="log-text">Everything else is done. Two decisions are waiting for you, with what I know about each.</p></div>
+            </div>
+            <p class="log-note">An illustrative day. Names and details are examples.</p>
+          </div>
         </div>
-        <div class="prose">
-          <p>I'm Mike McBride. I've spent fifteen years in healthcare as a consultant, P&amp;L leader, product executive, and health tech COO. I ran P&amp;L over a 9-clinic, 60-physician, 200-person group. I built a value-based care analytics platform that sold into 50+ health systems, including a household-name customer who told us they had tried and failed for a decade to build it themselves.</p>
-          <p>My cofounder is a security-first technical architect with a decade of production platform experience. Between us we cover the operator's view, the technologist's rigor, and the security posture these buyers require before they open the door.</p>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="cta" aria-labelledby="talk">
-      <div class="wrap">
-        <h2 id="talk">If you run a health insurance brokerage and you want your people doing human work instead of computer work, I'd love to talk.</h2>
-        <div class="cta-row">
-          <a class="btn" href="https://www.linkedin.com/in/mikemcbridelinkedin/" target="_blank" rel="noopener">Message me on LinkedIn</a>
-        </div>
-      </div>
-    </section>
-  </main>
+      <section class="center reveal">
+        <p class="proof">We're working with multiple insurance agencies as development partners. The first is live.</p>
+        <p class="founder">
+          I'm Mike McBride. Fifteen years in healthcare operations and product, including a value-based care
+          platform used by 50+ health systems. My cofounder is a security-first technical architect with a
+          decade of production platform experience.
+        </p>
+      </section>
 
-  <footer class="site-footer">
-    <div class="wrap">
+      <section class="reveal">
+        <div class="final center">
+          <h2>Give your people their days back.</h2>
+          <p class="lede">If you run a health insurance brokerage, I'd love to talk.</p>
+          <div class="cta-row">
+            <a class="btn" href="mailto:mikemcbride15@gmail.com">Get in touch</a>
+            <a class="btn btn-secondary" href="https://www.linkedin.com/in/mikemcbridelinkedin/" target="_blank" rel="noopener">Connect on LinkedIn</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
       <span>&copy; 2026 Rebuilt Health</span>
       <a href="https://www.linkedin.com/in/mikemcbridelinkedin/" target="_blank" rel="noopener">LinkedIn</a>
-    </div>
-  </footer>
+    </footer>
+  </div>
 
+  <script src="marks.js"></script>
   <script>
-    // The sort: chips start in one messy pile, then glide to their bin.
-    // Markup is already the sorted state, so no-JS and reduced-motion readers
-    // see the finished page. This only adds the motion.
+    LivingMarks.mountAll();
     (function () {
-      document.body.classList.remove('no-js');
-      var sort = document.getElementById('sort');
-      var replay = document.getElementById('sort-replay');
-      if (!sort) return;
-      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
-      var chips = Array.prototype.slice.call(sort.querySelectorAll('.chip'));
-
-      function run() {
-        if (reduce.matches) return;
-        sort.classList.remove('is-sorting');
-        chips.forEach(function (c) { c.style.transform = ''; });
-        var box = sort.getBoundingClientRect();
-        var ordered = chips.slice().sort(function (a, b) { return a.dataset.order - b.dataset.order; });
-        var pileTop = 0;
-        ordered.forEach(function (c, i) {
-          var r = c.getBoundingClientRect();
-          var targetX = box.left + (box.width - r.width) / 2 + ((i * 37) % 60 - 30);
-          var targetY = box.top + pileTop;
-          pileTop += Math.min(r.height * 0.62, 28);
-          var rot = ((i * 53) % 9) - 4;
-          c.style.transform = 'translate(' + (targetX - r.left) + 'px,' + (targetY - r.top) + 'px) rotate(' + rot + 'deg)';
-          // Delay lives in a custom property so it only applies while sorting.
-          c.style.setProperty('--delay', (120 + i * 70) + 'ms');
-        });
-        sort.classList.add('is-piled');
-        void sort.offsetWidth;
-        requestAnimationFrame(function () {
-          sort.classList.add('is-sorting');
-          sort.classList.remove('is-piled');
-          chips.forEach(function (c) { c.style.transform = ''; });
-        });
-      }
-
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(function () { setTimeout(run, 250); });
-      } else {
-        setTimeout(run, 400);
-      }
-      if (replay) replay.addEventListener('click', function () {
-        sort.scrollIntoView({ block: 'nearest', behavior: reduce.matches ? 'auto' : 'smooth' });
-        setTimeout(run, reduce.matches ? 0 : 200);
-      });
+      var els = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { rootMargin: '0px 0px -10% 0px' });
+      els.forEach(function (e) { io.observe(e); });
     })();
   </script>
 </body>
